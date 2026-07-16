@@ -16,7 +16,7 @@ This is a command line tool to convert the contents of a EasyRedmine Knowledgeba
 The tool is available as a Docker image. No local PHP or pandoc installation required.
 
 ```sh
-docker pull bluespice/migrate-easyredmine-knowledgebase:latest
+docker build -t bluespice/migrate-easyredmine-knowledgebase:latest .
 ```
 
 ### Option B: PHAR
