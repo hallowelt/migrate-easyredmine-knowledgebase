@@ -10,6 +10,17 @@ This is a command line tool to convert the contents of a EasyRedmine Knowledgeba
 4. `pandoc` >= 3.1.6. The `pandoc` tool must be installed and available in the `PATH` (https://pandoc.org/installing.html).
 
 ## Installation
+
+### Option A: Docker (recommended)
+
+The tool is available as a Docker image. No local PHP or pandoc installation required.
+
+```sh
+docker pull bluespice/migrate-easyredmine-knowledgebase:latest
+```
+
+### Option B: PHAR
+
 1. Download `migrate-easyredmine-knowledgebase.phar` from https://github.com/hallowelt/migrate-easyredmine-knowledgebase/releases/tag/latest
 2. Make sure the file is executable. E.g. by running `chmod +x migrate-easyredmine-knowledgebase.phar`
 3. Move `migrate-easyredmine-knowledgebase.phar` to `/usr/local/bin/migrate-easyredmine-knowledgebase` (or somewhere else in the `PATH`)
@@ -62,11 +73,35 @@ return array (
 );
 ```
 ### Generate migration data
+
+The commands below show the Docker variant. Replace
+```
+docker run --rm -v $(pwd):/data bluespice/migrate-easyredmine-knowledgebase:latest
+```
+with `migrate-easyredmine-knowledgebase` if you are using the PHAR installation.
+
 Run the migration commands:
-1. Run `migrate-easyredmine-knowledgebase analyze --src connection.json --dest workspace` to analyze and fetched from the database, creating intermediate code files.
-2. Run `migrate-easyredmine-knowledgebase extract --src Attachments --dest workspace` to extract (copy) needed attachments.
-3. Run `migrate-easyredmine-knowledgebase convert --src workspace --dest workspace` to convert page content into Wikitext that works in MediaWiki, creating an intermediate code file.
-4. Run `migrate-easyredmine-knowledgebase compose --src workspace --dest workspace` to compose a XML file that can be imported to MediaWiki.
+1. Run
+    ```sh
+    docker run --rm --network host -v $(pwd):/data bluespice/migrate-easyredmine-knowledgebase:latest analyze --src /data/connection.json --dest /data/workspace
+    ```
+    to analyze and fetch from the database, creating intermediate code files.
+    > **Note:** The container needs network access to your EasyRedmine database. Use `--network host` if the database is on the host machine or reachable via the host network. Adjust the network setting to match your setup (e.g. `--network <your-docker-network>` if the database runs in another container).
+2. Run
+    ```sh
+    docker run --rm -v $(pwd):/data bluespice/migrate-easyredmine-knowledgebase:latest extract --src /data/Attachments --dest /data/workspace
+    ```
+    to extract (copy) needed attachments.
+3. Run
+    ```sh
+    docker run --rm -v $(pwd):/data bluespice/migrate-easyredmine-knowledgebase:latest convert --src /data/workspace --dest /data/workspace
+    ```
+    to convert page content into Wikitext that works in MediaWiki, creating an intermediate code file.
+4. Run
+    ```sh
+    docker run --rm -v $(pwd):/data bluespice/migrate-easyredmine-knowledgebase:latest compose --src /data/workspace --dest /data/workspace
+    ```
+    to compose an XML file that can be imported to MediaWiki.
 ### Import into MediaWiki
 1. Copy the directory `workspace/result` into your target wiki server, if you are not on that server. Assume that it is copied to `/tmp/result`
 2. Go to your MediaWiki installation directory.

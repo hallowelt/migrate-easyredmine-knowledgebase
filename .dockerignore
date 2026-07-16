@@ -1,0 +1,8 @@
+# Docker builds: ignore everything in this folder except the files from the allow-list below
+*
+!docker
+!bin/migrate-easyredmine-knowledgebase
+!src
+!composer.json
+!LICENSE
+!README.md
