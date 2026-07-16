@@ -4,5 +4,6 @@
 !bin/migrate-easyredmine-knowledgebase
 !src
 !composer.json
+!composer.lock
 !LICENSE
 !README.md

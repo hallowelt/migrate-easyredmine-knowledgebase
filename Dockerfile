@@ -17,12 +17,13 @@ RUN mkdir app
 COPY ./bin/migrate-easyredmine-knowledgebase /app/bin/migrate-easyredmine-knowledgebase
 COPY ./src /app/src
 COPY ./composer.json /app/composer.json
+COPY ./composer.lock /app/composer.lock
 COPY ./LICENSE /app/LICENSE
 COPY ./README.md /app/README.md
 RUN chmod -R 755 /app
 
 WORKDIR /app
-RUN composer update --prefer-source --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader
 WORKDIR /
 
 RUN mkdir /data
