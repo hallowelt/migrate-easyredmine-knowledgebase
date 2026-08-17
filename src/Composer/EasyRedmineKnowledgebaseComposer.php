@@ -13,6 +13,7 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 		'wiki-pages',
 		'page-revisions',
 		'revision-wikitext',
+		'page-attachments',
 	];
 
 	/** @var DOMDocument */
@@ -26,6 +27,7 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 		$wikiPages = $this->dataBuckets->getBucketData( 'wiki-pages' );
 		$pageRevisions = $this->dataBuckets->getBucketData( 'page-revisions' );
 		$revisionWikitext = $this->dataBuckets->getBucketData( 'revision-wikitext' );
+		$pageAttachments = $this->dataBuckets->getBucketData( 'page-attachments' );
 		$this->dom = new DOMDocument();
 		$this->dom->formatOutput = true;
 		$this->dom->loadXML( '<mediawiki></mediawiki>' );
@@ -33,6 +35,7 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 			$pageEl = $this->dom->createElement( 'page' );
 			$this->addTextElTo( $pageEl, 'title', $page['formatted_title'] );
 			$this->addTextElTo( $pageEl, 'id', $id );
+			$this->addTextElTo( $pageEl, 'attachments', $pageAttachments[$id] );
 			# addTextElTo( $pageEl, 'redirect', $page['redirect'] );
 			foreach ( $pageRevisions[$id] as $version => $revision ) {
 				$revEl = $this->dom->createElement( 'revision' );

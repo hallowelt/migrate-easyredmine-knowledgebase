@@ -15,6 +15,7 @@ class EasyRedmineKnowledgebaseConverter extends SimpleHandler {
 	protected $dataBucketList = [
 		'wiki-pages',
 		'page-revisions',
+		'attachment-files',
 		'diagram-contents',
 		'rmw_pages',
 	];
@@ -52,6 +53,7 @@ class EasyRedmineKnowledgebaseConverter extends SimpleHandler {
 	 */
 	public function convert(): bool {
 		$wikiPages = $this->dataBuckets->getBucketData( 'wiki-pages' );
+		$attachments = $this->dataBuckets->getBucketData( 'attachment-files' );
 		$totalPages = count( $wikiPages );
 		$output = new ConsoleOutput();
 		$progressBar = new ProgressBar( $output, $totalPages );
@@ -60,12 +62,28 @@ class EasyRedmineKnowledgebaseConverter extends SimpleHandler {
 
 		$pageRevisions = $this->dataBuckets->getBucketData( 'page-revisions' );
 		foreach ( $wikiPages as $id => $page ) {
+			$pageAttachments = [];
+			foreach ( $attachments as $attachment ) {
+				$latestVersion = $attachment[max( array_keys( $attachment ) )];
+				if ( isset( $latestVersion['quoted_page_id'] )
+					&& $latestVersion['quoted_page_id'] == $id
+				) {
+					$pageAttachments[] = '* [[Media:' . $latestVersion['target_filename'] . ']]';
+				}
+			}
 			$result = [];
 			foreach ( $pageRevisions[$id] as $version => $revision ) {
 				$this->setCurrentPage( $id, $version );
 				$result[$version] = $this->doConvert( $revision['data'] );
 			}
 			$this->buckets->addData( 'revision-wikitext', $id, $result, false, false );
+			$this->buckets->addData(
+				'page-attachments',
+				$id,
+				implode( "\n", $pageAttachments ),
+				false,
+				false
+			);
 			$progressBar->advance();
 		}
 		$progressBar->finish();
