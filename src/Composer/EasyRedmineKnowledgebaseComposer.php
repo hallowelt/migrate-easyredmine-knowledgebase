@@ -35,7 +35,6 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 			$pageEl = $this->dom->createElement( 'page' );
 			$this->addTextElTo( $pageEl, 'title', $page['formatted_title'] );
 			$this->addTextElTo( $pageEl, 'id', $id );
-			$this->addTextElTo( $pageEl, 'attachments', $pageAttachments[$id] );
 			# addTextElTo( $pageEl, 'redirect', $page['redirect'] );
 			foreach ( $pageRevisions[$id] as $version => $revision ) {
 				$revEl = $this->dom->createElement( 'revision' );
@@ -51,6 +50,13 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 				$this->addTextElTo( $contributorEl, 'id', $revision['author_id'] );
 				$revEl->appendChild( $contributorEl );
 				$this->addTextElTo( $revEl, 'text', $revisionWikitext[$id][$version] );
+				$textEl = $this->dom->createElement( 'text' );
+				$textEl->appendChild( $this->dom->createTextNode( $revisionWikitext[$id][$version] ) );
+				$revEl->appendChild( $textEl );
+				if ( $pageAttachments[$id] ) {
+					$this->addTextElTo( $textEl, 'attachments', "\n{$pageAttachments[$id]}\n" );
+				}
+				$revEl->appendChild( $textEl );
 				$pageEl->appendChild( $revEl );
 			}
 			$this->dom->documentElement->appendChild( $pageEl );
