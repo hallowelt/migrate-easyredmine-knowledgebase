@@ -21,7 +21,6 @@ class Convert extends SimpleCommand {
 	protected function getBucketKeys() {
 		return [
 			'revision-wikitext',
-			'page-attachments',
 		];
 	}
 

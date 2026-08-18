@@ -13,7 +13,6 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 		'wiki-pages',
 		'page-revisions',
 		'revision-wikitext',
-		'page-attachments',
 	];
 
 	/** @var DOMDocument */
@@ -27,7 +26,6 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 		$wikiPages = $this->dataBuckets->getBucketData( 'wiki-pages' );
 		$pageRevisions = $this->dataBuckets->getBucketData( 'page-revisions' );
 		$revisionWikitext = $this->dataBuckets->getBucketData( 'revision-wikitext' );
-		$pageAttachments = $this->dataBuckets->getBucketData( 'page-attachments' );
 		$this->dom = new DOMDocument();
 		$this->dom->formatOutput = true;
 		$this->dom->loadXML( '<mediawiki></mediawiki>' );
@@ -50,13 +48,6 @@ class EasyRedmineKnowledgebaseComposer extends SimpleHandler {
 				$this->addTextElTo( $contributorEl, 'id', $revision['author_id'] );
 				$revEl->appendChild( $contributorEl );
 				$this->addTextElTo( $revEl, 'text', $revisionWikitext[$id][$version] );
-				$textEl = $this->dom->createElement( 'text' );
-				$textEl->appendChild( $this->dom->createTextNode( $revisionWikitext[$id][$version] ) );
-				$revEl->appendChild( $textEl );
-				if ( $pageAttachments[$id] ) {
-					$this->addTextElTo( $textEl, 'attachments', "\n{$pageAttachments[$id]}\n" );
-				}
-				$revEl->appendChild( $textEl );
 				$pageEl->appendChild( $revEl );
 			}
 			$this->dom->documentElement->appendChild( $pageEl );

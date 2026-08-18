@@ -74,16 +74,9 @@ class EasyRedmineKnowledgebaseConverter extends SimpleHandler {
 			$result = [];
 			foreach ( $pageRevisions[$id] as $version => $revision ) {
 				$this->setCurrentPage( $id, $version );
-				$result[$version] = $this->doConvert( $revision['data'] );
+				$result[$version] = $this->doConvert( $revision['data'], $pageAttachments );
 			}
 			$this->buckets->addData( 'revision-wikitext', $id, $result, false, false );
-			$this->buckets->addData(
-				'page-attachments',
-				$id,
-				implode( "\n", $pageAttachments ),
-				false,
-				false
-			);
 			$progressBar->advance();
 		}
 		$progressBar->finish();
@@ -130,9 +123,10 @@ class EasyRedmineKnowledgebaseConverter extends SimpleHandler {
 
 	/**
 	 * @param string $content
+	 * @param array $pageAttachments
 	 * @return string
 	 */
-	public function doConvert( $content ) {
+	public function doConvert( $content, array $pageAttachments = [] ) {
 		$content = $this->preprocess( $content );
 		if ( !$this->isTextileContent( $content ) ) {
 			$content = $this->processWithPandoc( $content, 'html', 'textile' );
@@ -144,6 +138,9 @@ class EasyRedmineKnowledgebaseConverter extends SimpleHandler {
 		$content = $this->fixAfterPandoc( $content );
 		$content = $this->handleHTMLTables( $content );
 		$content = $this->handleCodeAndNonCode( $content );
+		if ( $pageAttachments ) {
+			$content .= "\n<attachments>\n" . implode( "\n", $pageAttachments ) . "\n</attachments>\n";
+		}
 		return $content;
 	}
 
